@@ -1,0 +1,33 @@
+{
+	"name": "live",
+	"version": "0.0.0",
+	"author": "CoderPuppy",
+	"private": true,
+	"description": "Testing my live libraries",
+
+	"dependencies": {
+		"coffee-script": "*",
+		"nodemon"      : "*",
+		"forever"      : "*",
+		"browserify"   : "*",
+
+		"reconnect": "*",
+		"domready" : "*",
+
+		"stream-serializer": "*",
+		"scuttlebucket"    : "*",
+		"duplex-stream"    : "*",
+		"scuttlebutt"      : "*",
+		"r-value"          : "*",
+		"r-array"          : "*",
+		"through"          : "*",
+		"between"          : "*",
+		"r-edit"           : "*",
+		"shoe"             : "*",
+		"muxy"             : "*",
+		"hat"              : "*",
+
+		"connect" : "*",
+		"ecstatic": "*"
+	}
+}
