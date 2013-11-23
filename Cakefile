@@ -9,6 +9,7 @@ build = (watch, cb) ->
 
 run = (exec, args, cb) ->
 	proc = childProcess.spawn exec, args
+	proc.stdout.on 'data', (buffer) -> console.log buffer.toString()
 	proc.stderr.on 'data', (buffer) -> console.log buffer.toString()
 	proc.on 'exit', (status) ->
 		process.exit(1) if status != 0
@@ -23,6 +24,8 @@ task 'npm:install:watch', 'install all the packages', -> run 'node', ['node_modu
 task 'server', 'run the server', ->
 	run 'node', ['node_modules/forever/bin/forever',
 	             '-o', 'server.log', '-e', 'server.log', '--spinSleepTime', '0',
-	             'node_modules/nodemon/nodemon.js', '--watch', 'lib', '-e', 'js', '-q', '--exitcrash',
 	             'lib/server/server.js']
-	# run 'tail', ['-f', 'server.log']
+
+task 'server:dev', 'run the server', ->
+	console.log '\x1B[32mRunning server in development\x1B[0m'
+	run 'node', ['node_modules/nodemon/nodemon.js', '--watch', 'lib', '-e', 'js', '-q', '--exitcrash', 'lib/server/server.js']
