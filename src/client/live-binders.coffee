@@ -1,4 +1,4 @@
-ldata = require '../shared/live-data'
+ldata = require 'live-data'
 
 exports.textContent = (el) ->
 	val = new ldata.Value
@@ -12,15 +12,21 @@ exports.innerHTML = (el) ->
 
 exports.value = (el) ->
 	val = new ldata.Value
-	val.on 'update', (d) ->
-		if el.value != d
+	
+	applyDom = (d) ->
+		if typeof d == 'string' and d.length > 0 and el.value != d
 			el.value = d
+
+	# applyDom val.get()
+	val.on 'update', applyDom
+
 	if el.value
 		val.set el.value
-	update = ->
+
+	applyModel = ->
 		val.set el.value
-	el.addEventListener('input', update)
-	el.addEventListener('keyup', update)
+	el.addEventListener('input', applyModel)
+	el.addEventListener('keyup', applyModel)
 	val
 
 exports.array = (parent, fn) ->

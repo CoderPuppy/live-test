@@ -2,16 +2,20 @@ require 'shoe' # So reconnect will detect shoe
 reconnect = require 'reconnect'
 domready  = require 'domready'
 binders   = require '../client/live-binders'
-ldata     = require '../shared/live-data'
+ldata     = require 'live-data'
 base      = require '../shared/base'
 
 window.val = base.val
 window.app = base.app
 
-window.ldata = require '../shared/live-data'
+window.m = base.messages
+
+window.ldata = ldata
+
+username = new ldata.Value 'No One'
 
 domready ->
-	messages = null
+	messagesBinding = null
 
 	(->
 		container = document.createElement 'div'
@@ -20,12 +24,13 @@ domready ->
 		container.style.position = 'relative'
 		container.style.height   = '500px'
 		container.style.border   = '1px solid black'
+		container.id = 'messages'
 
 		# messages = document.createElement 'ul'
 		# container.appendChild messages
 		messagesBinding = binders.array(container, (val) ->
 			el = document.createElement 'div'
-			val.pipe binders.textContent(el)
+			val.map((str) -> str.replace(/\t/g, '    ').replace(/[ ]/g, '&nbsp;')).pipe binders.innerHTML(el)
 			el
 		)
 		base.messages.pipe(messagesBinding)
@@ -33,10 +38,14 @@ domready ->
 		container.scrollTop = container.scrollHeight
 		setInterval(->
 		# messagesBinding.on 'dom:insert', ->
-			if container.scrollHeight - container.scrollTop < 505
+			if container.scrollHeight - container.scrollTop <= 505
 				container.scrollTop = container.scrollHeight
 		, 10)
 	)()
+
+	usernameField = document.createElement 'input'
+	username.pipe(binders.value usernameField).pipe username
+	document.body.appendChild usernameField
 
 	(->
 		form = document.createElement 'form'
@@ -45,7 +54,9 @@ domready ->
 			e.preventDefault()
 			e.returnValue = false
 
-			base.messages.push new ldata.Value(msg.value)
+			sendingMessage = msg.value
+			base.messages.push username.map (username) ->
+				"#{username}: #{sendingMessage}" # new ldata.Value(msg.value)
 			msg.value = ''
 
 			return false
@@ -60,8 +71,9 @@ domready ->
 		clear = document.createElement 'button'
 		clear.textContent = 'Clear Chat'
 		clear.addEventListener 'click', (e) ->
-			base.messages.each ->
-				base.messages.pop()
+			# base.messages.each ->
+			messagesBinding.each ->
+				@pop()
 		document.body.appendChild clear
 	)()
 
